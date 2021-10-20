@@ -1,0 +1,32 @@
+---
+title: "tidy tuesday 2021-10-19 Pumpkin"
+output: html_notebook
+---
+
+
+```{r data}
+tuesdata <- tidytuesdayR::tt_load('2021-10-19')
+tuesdata <- tidytuesdayR::tt_load(2021, week = 43)
+
+pumpkins <- tuesdata$pumpkins
+```
+
+
+```{r data wrangling}
+
+df <- pumpkins %>%
+  mutate(year = str_sub(id, 1,4),
+         weight_lbs= as.numeric(weight_lbs)) %>%
+  filter(!grepl('Entries', weight_lbs)) 
+
+
+ggplot(data = df) +
+  aes(x= year, y= weight_lbs, ymax= 2000) +
+  geom_boxplot()
+
+ggplot(data = df) +
+  aes(x= weight_lbs) +
+  geom_histogram()
+
+```
+
