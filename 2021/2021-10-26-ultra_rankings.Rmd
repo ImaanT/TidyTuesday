@@ -1,0 +1,52 @@
+---
+title: "2021-10-26-ultra_rankings"
+output: html_notebook
+---
+
+
+```{r get data}
+ultra_rankings <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-26/ultra_rankings.csv')
+race <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-26/race.csv')
+
+```
+
+
+```{r men vs women time}
+
+
+ggplot(ultra_rankings, aes(x= gender, y= time_in_seconds)) +
+  ggdist::stat_interval(.width  =  c(.25,  .5,  .95,  1),
+                        labels  =  function(x)  paste0(as.numeric(x)*100,  "%") )   +  ggdist::stat_halfeye(shape  =  23,   stroke  =  1,   point_size  =  1,   point_colour  =  "black",   point_fill  =  "white" ) 
+
+```
+
+
+```{r number of participants per year in different countries}
+
+# clean data
+racep <- race %>%
+  mutate(date = str_sub(date, 1,4)) %>%
+  filter(participants > 0)
+
+
+ggplot(racep, aes(y= country, x= participants)) +
+  ggridges::stat_density_ridges() 
+
+```
+
+
+```{r ultra-running participants Women and Man}
+
+# clean
+data2 <- left_join(ultra_rankings, racep, by = "race_year_id")
+data2 %<>%
+  mutate(kmph = distance/(time_in_seconds/3600)) %>%
+  drop_na()
+
+
+ggplot(data2, aes(y= kmph, x= date)) +
+  geom_violin() 
+  
+
+```
+
